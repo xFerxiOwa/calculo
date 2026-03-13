@@ -44,28 +44,34 @@ document.getElementById("area").innerHTML =
 // AREA EXACTA
 
 let matchPot = f.match(/x\^(\d+)/)
-let matchConst = f.match(/\+(\d+)/)
+let matchLineal = f.match(/(\d*)x(?!\^)/)
+let matchConst = f.match(/(^|\+)(\d+)(?!x)/)
 
 let exacta = 0
 
-// parte x^n
+// x^n
 if(matchPot){
 
 let k = parseInt(matchPot[1])
-
 exacta += (Math.pow(b,k+1)/(k+1)) - (Math.pow(a,k+1)/(k+1))
 
 }
 
-// parte constante
-if(matchConst){
+// ax
+if(matchLineal){
 
-let c = parseInt(matchConst[1])
-
-exacta += c*(b-a)
+let c = matchLineal[1] === "" ? 1 : parseInt(matchLineal[1])
+exacta += (c/2)*(b*b - a*a)
 
 }
 
+// constante
+if(matchConst){
+
+let c = parseInt(matchConst[2])
+exacta += c*(b-a)
+
+}
 // mostrar resultado
 if(matchPot || matchConst){
 
@@ -123,33 +129,69 @@ function generarPasosIntegral(funcion,a,b){
 let pasos=""
 
 let matchPot = funcion.match(/x\^(\d+)/)
-let matchConst = funcion.match(/\+(\d+)/)
+let matchLineal = funcion.match(/(\d*)x(?!\^)/)
+let matchConst = funcion.match(/(^|\+)(\d+)(?!x)/)
 
+pasos += `\\[A = \\int_{${a}}^{${b}} ${funcion} dx\\]`
+
+// POTENCIA x^n
 if(matchPot){
 
 let k=parseInt(matchPot[1])
 
-pasos += `\\[A = \\int_{${a}}^{${b}} ${funcion} dx\\]`
-
 pasos += `\\[\\int x^{${k}} dx = \\frac{x^{${k+1}}}{${k+1}}\\]`
 
+}
+
+// TERMINO LINEAL ax
+if(matchLineal){
+
+let c = matchLineal[1] === "" ? 1 : parseInt(matchLineal[1])
+
+pasos += `\\[\\int ${c}x\\,dx = \\frac{${c}}{2}x^2\\]`
+
+}
+
+// CONSTANTE
 if(matchConst){
 
-let c=parseInt(matchConst[1])
+let c=parseInt(matchConst[2])
 
 pasos += `\\[\\int ${c} dx = ${c}x\\]`
 
-pasos += `\\[F(x)=\\frac{x^{${k+1}}}{${k+1}}+${c}x\\]`
+}
 
-}else{
+// FUNCION PRIMITIVA
+let partes=[]
 
-pasos += `\\[F(x)=\\frac{x^{${k+1}}}{${k+1}}\\]`
+if(matchPot){
+
+let k=parseInt(matchPot[1])
+partes.push(`\\frac{x^{${k+1}}}{${k+1}}`)
+
+}
+
+if(matchLineal){
+
+let c = matchLineal[1] === "" ? 1 : parseInt(matchLineal[1])
+partes.push(`\\frac{${c}}{2}x^2`)
+
+}
+
+if(matchConst){
+
+let c=parseInt(matchConst[2])
+partes.push(`${c}x`)
+
+}
+
+if(partes.length>0){
+
+pasos += `\\[F(x)=${partes.join("+")}\\]`
 
 }
 
 pasos += `\\[A = F(${b})-F(${a})\\]`
-
-}
 
 return pasos
 
