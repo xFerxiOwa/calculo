@@ -47,15 +47,16 @@ input{
 button{
     padding:10px 20px;
     border:none;
-    background:#00e5ff;
-    color:black;
+    background:#6d43a1;
+    color:rgb(224, 187, 255);
     font-weight:bold;
     border-radius:6px;
     cursor:pointer;
 }
 
 button:hover{
-    background:#00bcd4;
+    background:#cea9ff;
+    color:#6d43a1;
 }
 
 .resultados{
